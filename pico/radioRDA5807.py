@@ -1,7 +1,7 @@
 #
 # Python module to interface with RDA5807 FM radio device using I2C bus
 #
-# Copyright (c) ha864 2025
+# Copyright (c) 2025 ha864git
 #
 # License: MIT
 #
@@ -125,18 +125,13 @@ class RadioRDA5807:
         """ Set tuned frequency in MHz """
 
         frequency_in = frequency_MHz
+        frequency_steps = round((frequency_in - self.start_frequency_MHz)/self.frequency_spacing_MHz)
+        data = ((frequency_steps << 6) | RDA5807M_REG_TUNING_FLG_TUNE | RDA5807M_REG_TUNING_BAND_WIDE | RDA5807M_REG_TUNING_SPACE_100K)
+        self.write_reg(RDA5807M_REG_TUNING, data)
         while True:
-            frequency_steps = int((frequency_in - self.start_frequency_MHz)/self.frequency_spacing_MHz)
-            data = ((frequency_steps << 6) | RDA5807M_REG_TUNING_FLG_TUNE | RDA5807M_REG_TUNING_BAND_WIDE | RDA5807M_REG_TUNING_SPACE_100K)
-            self.write_reg(RDA5807M_REG_TUNING, data)
-            while True:
-                data = self.read_reg(RDA5807M_REG_TUNING)
-                if not data & RDA5807M_REG_TUNING_FLG_TUNE:
-                    break
-            frequency_out = self.start_frequency_MHz + ((self.read_reg(RDA5807M_REG_STATUS) & RDA5807M_REG_STATUS_MASK_READCHAN) * self.frequency_spacing_MHz)
-            if frequency_out == frequency_MHz:
+            data = self.read_reg(RDA5807M_REG_TUNING)
+            if not data & RDA5807M_REG_TUNING_FLG_TUNE:
                 break
-            frequency_in = frequency_in + (frequency_in - frequency_out) / 2
             
     def get_frequency_MHz(self):
 
