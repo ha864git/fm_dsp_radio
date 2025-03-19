@@ -124,8 +124,7 @@ class RadioRDA5807:
 
         """ Set tuned frequency in MHz """
 
-        frequency_in = frequency_MHz
-        frequency_steps = round((frequency_in - self.start_frequency_MHz)/self.frequency_spacing_MHz)
+        frequency_steps = round((frequency_MHz - self.start_frequency_MHz)/self.frequency_spacing_MHz)
         data = ((frequency_steps << 6) | RDA5807M_REG_TUNING_FLG_TUNE | RDA5807M_REG_TUNING_BAND_WIDE | RDA5807M_REG_TUNING_SPACE_100K)
         self.write_reg(RDA5807M_REG_TUNING, data)
         while True:

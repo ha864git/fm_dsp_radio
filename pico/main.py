@@ -7,7 +7,6 @@ import time
 
 stations = [
     [76.4,"RADIO BERRY"],
-    [77.1,"HOUSOU DAIGAKU"],
     [79.5,"NACK5"],
     [78.0,"bayfm"],
     [80.0,"TOKYO FM"],
