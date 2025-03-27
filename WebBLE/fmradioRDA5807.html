@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>FM Radio RDA5807 Controller</title>
+</head>
+
+<style>
+    .radio-panel {
+        margin: 0 auto;
+        text-align: center;
+        background: silver;
+        width: 600px;
+        padding: 10px;
+    }
+
+    .wrap-blebutton {
+        position: absolute;
+        margin-top: 0px;
+        margin-left: 480px;
+    }
+
+    .title {
+        font-size: 30px;
+        text-align: center;
+        color: rgb(5, 10, 14);
+    }
+
+    .station-button {
+        height: 50px;
+        width: 190px;
+        background-color: #2f4f4f;
+        color: #fff;
+        padding: 10px 10px;
+        text-decoration: none;
+        font-size: 1em;
+    }
+
+    .station-button:hover {
+        color: #fff;
+        opacity: 0.8;
+    }
+
+    .volumebutton {
+        width: 25px;
+        color: blue;
+        background: transparent;
+        border: none;
+    }
+
+    .seekbutton {
+        height: 30px;
+        width: 82px;
+        background-color: #2f4f4f;
+        color: #fff;
+        padding: 3px 3px;
+        text-decoration: none;
+        font-size: 1em;
+    }
+
+    .pwrap {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+    }
+
+    .radiodispcola {
+        width: 30px;
+    }
+
+    .radiodispcolb {
+        width: 65px;
+    }
+
+    #tbl_station {
+        font-size: 21px;
+        background: aqua;
+    }
+
+    #tbl_frequency {
+        font-size: 30px;
+        background: aqua;
+    }
+
+    #tbl_mode {
+        background: aqua;
+    }
+
+    #tbl_rssi {
+        background: aqua;
+    }
+
+    .tbldsp {
+        border: 0px none;
+        border-spacing: 0px;
+        background: aqua;
+    }
+
+    table#regtb {
+        border: 1px solid #333;
+    }
+
+    th.regth {
+        border: 1px solid #333;
+    }
+
+    td.regtd {
+        border: 1px solid #333;
+    }
+
+    .sws {
+        display: inline-flex;
+        flex-direction: column;
+        align-items: start;
+    }
+
+    .sw {
+        height: 28px;
+        width: 100px;
+        background-color: #2f4f4f;
+        color: #fff;
+        padding: 3px 3px;
+        text-decoration: none;
+        font-size: 1em;
+        margin-left: 10px;
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+
+    #regtable {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+    }
+
+    .regbutton {
+        height: 28px;
+        width: 80px;
+        background-color: #2f4f4f;
+        color: #fff;
+        padding: 3px 3px;
+        text-decoration: none;
+        font-size: 1em;
+    }
+</style>
+
+<body>
+    <div class="radio-panel">
+        <div class="wrap-blebutton"><button id="connect-BleButton" class="sw">Connect</button></div>
+        <div class="title">FM Radio RDA5807</div>
+        <div class="pwrap">
+            <table class="tbldsp">
+                <colgroup>
+                    <col class="radiodispcola">
+                    <col class="radiodispcolb">
+                    <col class="radiodispcolb">
+                    <col class="radiodispcola">
+                </colgroup>
+                <tbody class="noborder">
+                    <tr>
+                        <td id="tbl_station" colspan="4">-------</td>
+                    </tr>
+                    <tr>
+                        <td id="tbl_frequency" colspan="2" rowspan="2">-------</td>
+                        <td id="tbl_mode" colspan="2">-------</td>
+                    </tr>
+                    <tr>
+                        <td id="tbl_rssi" colspan="2">-------</td>
+                    </tr>
+                    <tr>
+                        <td colspan="2"><button class="seekbutton" type="button"
+                                onclick="onclick_seek('down')">▼</button></td>
+                        <td colspan="2"><button class="seekbutton" type="button" onclick="onclick_seek('up')">▲</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><button class="volumebutton" type="button" onclick="onclick_volume('down')">-</button></td>
+                        <td colspan="2"><input type="range" list="my-datalist" id="volume2" name="volume" min="0"
+                                max="15" onchange="onchange_volume(this)" /></td>
+                        <td><button class="volumebutton" type="button" onclick="onclick_volume('up')">+</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="sws">
+                <button id="mutebutton" class="sw" type="button" onclick="onclick_mute()">---</button>
+                <button id="monobutton" class="sw" type="button" onclick="onclick_mono()">---</button>
+                <button id="bassbutton" class="sw" type="button" onclick="onclick_bass()">---</button>
+                <button id="regbutton" class="sw" type="button" onclick="onclick_reg()">---</button>
+            </div>
+        </div>
+        <div id='selbuttons' class="buttons"></div>
+
+        <datalist id="my-datalist">
+            <option value="0"></option>
+            <option value="1"></option>
+            <option value="2"></option>
+            <option value="3"></option>
+            <option value="4"></option>
+            <option value="5"></option>
+            <option value="6"></option>
+            <option value="7"></option>s
+            <option value="8"></option>
+            <option value="9"></option>
+            <option value="10"></option>
+            <option value="11"></option>
+            <option value="12"></option>
+            <option value="13"></option>
+            <option value="14"></option>
+            <option value="15"></option>
+        </datalist>
+
+    </div>
+    <div id="register_table">
+        <div id="regtable"></div>
+    </div>
+
+    <script>
+
+        stations = [
+            [76.4, "RADIO BERRY", 1],
+            [79.5, "NACK5", 1],
+            [78.0, "bayfm", 1],
+            [80.0, "TOKYO FM", 1],
+            [80.3, "NHK FM 宇都宮", 1],
+            [80.7, "NHK FM 千葉", 1],
+            [81.3, "J-WAVE", 1],
+            [81.6, "NHK FM 群馬", 1],
+            [81.9, "NHK FM 神奈川", 1],
+            [82.5, "NHK FM 東京", 1],
+            [83.0, "FM-FUJI", 1],
+            [83.2, "NHK FM 茨城", 1],
+            [84.7, "Fm yokohama", 1],
+            [85.1, "NHK FM 埼玉", 1],
+            [85.6, "NHK FM 山梨", 1],
+            [86.3, "ＦＭぐんま", 1],
+            [89.7, "Inter FM 897", 1],
+            [90.5, "TBSラジオ", 1],
+            [90.9, "山梨放送", 1],
+            [91.6, "文化放送", 1],
+            [92.4, "RF ラジオ日本", 1],
+            [93.0, "ニッポン放送", 1],
+            [94.1, "栃木放送", 1],
+            [94.6, "LuckyFM茨城放送", 1]
+        ]
+
+        Reg_RDA5807 = [
+            [0, 0xff00, 8, 'x', 2, 'CHIPID', 'CHIPID', 'Chip ID. RDA5807=0x58'],
+            [2, 0x8000, 15, 'b', 1, 'CONFIG', 'DHIZ', 'Audio Output High-Z Disable. 1= Normal operation'],
+            [2, 0x4000, 14, 'b', 1, 'CONFIG', 'DMUTE', 'Mute Disable. 1 = Normal operation'],
+            [2, 0x2000, 13, 'b', 1, 'CONFIG', 'MONO', 'Mono Select. 0 = Stereo; 1 = Force mono'],
+            [2, 0x1000, 12, 'b', 1, 'CONFIG', 'BASS', 'Bass Boost. 0 = Disabled; 1 = Bass boost enabled'],
+            [2, 0x0800, 11, 'b', 1, 'CONFIG', 'RCLKNOCAL', '0 default. 0=RCLK clock is always supply'],
+            [2, 0x0400, 10, 'b', 1, 'CONFIG', 'RCLKDIRECT', '0 default. 1=RCLK clock use the directly input mode'],
+            [2, 0x0200, 9, 'b', 1, 'CONFIG', 'SEEKUP', 'Seek Up. 0 = Seek down; 1 = Seek up'],
+            [2, 0x0100, 8, 'b', 1, 'CONFIG', 'SEEK', 'Seek 0 = Disable stop seek; 1 = Enable'],
+            [2, 0x0010, 7, 'b', 1, 'CONFIG', 'SKMODE', '0 = wrap at the upper or lower band limit and continue seeking'],
+            [2, 0x0070, 4, 'b', 1, 'CONFIG', 'CLK_MODE', '000 default.'],
+            [2, 0x0008, 3, 'b', 1, 'CONFIG', 'RDS_EN', '0 default. If 1, rds/rbds enable'],
+            [2, 0x0004, 2, 'b', 1, 'CONFIG', 'NEW_METHOD', 'New Demodulate Method Enable, can improve the receive sensitivity about 1dB.'],
+            [2, 0x0002, 1, 'b', 1, 'CONFIG', 'SOFT_RESET', 'Soft reset. If 0, not reset; If 1, reset.'],
+            [2, 0x0001, 0, 'b', 1, 'CONFIG', 'ENABLE', 'Power Up Enable. 0 = Disabled; 1 = Enabled'],
+            [3, 0xffc0, 6, 'd', 4, 'TUNING', 'CHAN', 'Channel Select. f=76.0+0.1*CHAN'],
+            [3, 0x0020, 5, 'b', 1, 'TUNING', 'DIRECT', '0 default. Directly Control Mode, Only used when test.'],
+            [3, 0x0010, 4, 'b', 1, 'TUNING', 'TUNE', 'Tune  The tune operation begins when the TUNE bit is set high.'],
+            [3, 0x000c, 2, 'b', 2, 'TUNING', 'BAND_WIDE', '10 = 76-108 MHz(world wide)'],
+            [3, 0x0003, 0, 'b', 2, 'TUNING', 'SPACE', '00 = 100 kHz'],
+            [4, 0x0800, 11, 'b', 1, 'GPIO', 'DE', 'De - emphasis. 0 = 75µs(USA); 1 = 50µs(Japan / EU)'],
+            [4, 0x0200, 9, 'b', 1, 'GPIO', 'SOFTMUTE_EN', '1(default ) = softmute enable'],
+            [4, 0x0100, 8, 'b', 1, 'GPIO', 'AFCD', '0(default ) = AFC work'],
+            [5, 0x8000, 15, 'b', 1, 'VOLUME', 'INTMODE', 'for RDS mode  default: 1'],
+            [5, 0x0f00, 8, 'b', 4, 'VOLUME', 'SEEKTH', 'Seek SNR threshold value default: 1000'],
+            [5, 0x000f, 0, 'd', 2, 'VOLUME', 'VOLUME', 'DAC Gain Control Bits(Volume). default: 15'],
+            [6, 0xffff, 0, 'x', 4, 'I2S', 'I2S', 'i2s default 0x0000'],
+            [7, 0x7c00, 9, 'b', 1, 'BLEND', 'TH_SOFRBLEND', '10000 default. Threshold for noise soft blend setting, unit 2dB'],
+            [7, 0x0002, 9, 'b', 1, 'BLEND', 'SOFTBLEND_EN', '1 default. If 1, Softblend enable'],
+            [10, 0x4000, 14, 'b', 1, 'STATUS', 'STC', 'Seek / Tune Complete. 1 = Complete'],
+            [10, 0x2000, 13, 'b', 1, 'STATUS', 'SF', 'Seek Fail. 1 = Seek failure'],
+            [10, 0x0400, 10, 'b', 1, 'STATUS', 'ST', 'Stereo Indicator 0 = Mono; 1 = Stereo'],
+            [10, 0x03ff, 0, 'd', 4, 'STATUS', 'READCHAN', 'Read Channel. f=76.0+0.1*CHAN'],
+            [11, 0xfe00, 9, 'd', 3, 'RSSI', 'RSSI', 'RSSI（Received Signal Strength Indicator）0 - 127'],
+            [11, 0x0100, 8, 'b', 1, 'RSSI', 'FMTRUE', 'FM True. 1 = the current channel is a station'],
+            [11, 0x0080, 7, 'b', 1, 'RSSI', 'FMREADY', 'FM Ready. 1 = ready, 0 = not ready'],
+        ];
+
+        function make_select_station() {
+            let ht = '';
+            stations.forEach(station => {
+                if (station[2] === 1) {
+                    ht += `<button class="station-button" type="button" onclick="onclick_station(${station[0]})">${station[1]}</button>`;
+                }
+            });
+            document.getElementById('selbuttons').innerHTML = ht;
+        }
+
+        function make_html_Reg_RDA5807() {
+            let ht = '<table id="regtb">';
+            ht += '<thead>';
+            ht += '<tr>';
+            ht += '<th class="regth">reg</th>';
+            ht += '<th class="regth">address</th>';
+            ht += '<th class="regth">read</th>';
+            ht += '<th class="regth">name</th>';
+            ht += '<th class="regth">mask</th>';
+            ht += '<th class="regth">n</th>';
+            ht += '<th class="regth">data</th>';
+            ht += '<th class="regth">note</th>';
+            ht += '</tr>';
+            ht += '</thead>';
+            ht += '<tbody id="regtbody">';
+            Reg_RDA5807.forEach((line, i) => {
+                ht += '<tr>';
+                let reg = line[5];
+                let adr = ('00' + line[0].toString(16)).slice(-2);
+                let [p, n] = get_rowspan(reg);
+                if (p === i) {
+                    ht += `<td class="regtd" rowspan="${n}" onclick="onclick_td(this)"><button class="regbutton">${reg}</button></td>`;
+                    ht += `<td class="regtd" rowspan="${n}">0x${adr}</td>`;
+                    ht += `<td class="regtd" rowspan="${n}"></td>`
+                }
+                ht += `<td class="regtd">${line[6]}</td>`
+                let mask = ('0000' + line[1].toString(16)).slice(-4);
+                ht += `<td class="regtd">0x${mask}</td>`
+                ht += `<td class="regtd">${line[3]}</td>`
+                ht += `<td class="regtd"></td>`
+                ht += `<td class="regtd">${line[7]}</td>`
+                ht += '</tr>'
+            });
+            ht += '</tbody></table>';
+            document.getElementById('regtable').innerHTML = ht;
+        }
+
+        function get_rowspan(reg) {
+            let ans = 0;
+            let line = -1;
+            for (let i = 0; i < Reg_RDA5807.length; i++) {
+                if (Reg_RDA5807[i][5] === reg) {
+                    ans += 1;
+                    if (line === -1) line = i;
+                }
+            }
+            return [line, ans];
+        }
+
+        function radio_display_init() {
+            document.getElementById('tbl_station').innerHTML = '---------';
+            document.getElementById('tbl_frequency').innerHTML = '-----';
+            document.getElementById('tbl_mode').innerHTML = '-----';
+            document.getElementById('tbl_rssi').innerHTML = '-----';
+            document.getElementById('mutebutton').innerHTML = '---';
+            document.getElementById('bassbutton').innerHTML = '---';
+            document.getElementById('monobutton').innerHTML = '---';
+        }
+
+        let flg_mute = false;
+        let flg_mono = false;
+        let flg_bass = false;
+        let flg_reg = false;
+
+        document.getElementById('regbutton').innerHTML = 'view-reg';
+        document.getElementById('register_table').style.display = 'none';
+
+        make_select_station();
+        make_html_Reg_RDA5807();
+
+        const UUID_UART_SERVICE = '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
+        const UUID_TX_CHAR_CHARACTERISTIC = '6e400003-b5a3-f393-e0a9-e50e24dcca9e'
+        const UUID_RX_CHAR_CHARACTERISTIC = '6e400002-b5a3-f393-e0a9-e50e24dcca9e'
+
+        let options = {
+            filters: [
+                { services: [UUID_UART_SERVICE] },
+                { namePrefix: "mpy-uart" },
+            ],
+        };
+
+        let bluetoothDevice;
+        let tx_characteristic;
+        let rx_characteristic;
+
+        // Connect Button (search for BLE Devices only if BLE is available)
+        document.getElementById('connect-BleButton').addEventListener('click', (event) => {
+            if (isWebBluetoothEnabled() && !bluetoothDevice) {
+                document.getElementById('connect-BleButton').innerHTML = "connecting";
+                connectToDevice();
+            }
+        });
+
+        // Check if BLE is available in your Browser
+        function isWebBluetoothEnabled() {
+            if (!navigator.bluetooth) {
+                console.log("Web Bluetooth API is not available in this browser!");
+                document.getElementById('connect-BleButton').innerHTML = "not available";
+                return false
+            }
+            console.log('Web Bluetooth API supported in this browser.');
+            return true
+        }
+
+        // Connect to BLE Device and Enable Notifications
+        function connectToDevice() {
+            console.log('Initializing Bluetooth...');
+            navigator.bluetooth.requestDevice(options)
+                .then(device => {
+                    bluetoothDevice = device;
+                    console.log('Device Selected:', device.name);
+                    // Set up event listener for when device gets disconnected.
+                    device.addEventListener('gattserverdisconnected', onDisconnected);
+                    return device.gatt.connect();
+                })
+                .then(gattServer => {
+                    bleServer = gattServer;
+                    console.log("Connected to GATT Server");
+                    return bleServer.getPrimaryService(UUID_UART_SERVICE);
+                })
+                .then(service => {
+                    bleServiceFound = service;
+                    console.log("Service discovered:", service.uuid);
+                    return Promise.all([
+                        service.getCharacteristic(UUID_TX_CHAR_CHARACTERISTIC),
+                        service.getCharacteristic(UUID_RX_CHAR_CHARACTERISTIC)
+                    ]);
+                })
+                .then(characteristic => {
+                    console.log("Characteristic discovered:", characteristic);
+                    tx_characteristic = characteristic[0];
+                    tx_characteristic.startNotifications();
+                    console.log("Notifications Started.");
+                    tx_characteristic.addEventListener('characteristicvaluechanged', onCharacteristicValueChanged);
+                    rx_characteristic = characteristic[1];
+                    document.getElementById('connect-BleButton').innerHTML = "Connected";
+                    send_message('status');
+                })
+                .catch(error => {
+                    console.log('Error: ', error);
+                    document.getElementById('connect-BleButton').innerHTML = "Connect";
+                })
+        }
+
+        function onDisconnected(event) {
+            const device = event.target;
+            console.log(`Device ${device.name} is disconnected.`);
+            bluetoothDevice = null;
+            document.getElementById('connect-BleButton').innerHTML = "Connect";
+            radio_display_init();
+        }
+
+        // Receive messages from picoW
+        function onCharacteristicValueChanged(e) {
+            let str_arr = [];
+            for (let i = 0; i < this.value.byteLength; i++) {
+                str_arr[i] = this.value.getUint8(i);
+            }
+            let str = String.fromCharCode.apply(null, str_arr);
+            check_rx_data(str);
+        }
+
+        let tx_buffer = [];
+
+        // Send message
+        function send_message(message) {
+            if (!bluetoothDevice || !bluetoothDevice.gatt.connected || !rx_characteristic) {
+                alert('Please connect.');
+                return;
+            }
+            let ArrayBuffer = new TextEncoder().encode(message + '\n');
+            rx_characteristic.writeValueWithResponse(ArrayBuffer)
+                .then(ans => {
+                    if (tx_buffer.length > 0) {
+                        // Retrieve and send data that could not be sent
+                        let ArrayBuffer2 = tx_buffer.pop();
+                        rx_characteristic.writeValueWithoutResponse(ArrayBuffer2);
+                    }
+                })
+                .catch(error => {
+                    // Save data that could not be sent
+                    tx_buffer.unshift(ArrayBuffer);
+                });
+        }
+
+        function set_table_reg(reg, value) {
+            for (let i = 0; i < Reg_RDA5807.length; i++) {
+                if (Reg_RDA5807[i][0] === reg) {
+                    let tbody = document.getElementById('regtbody');
+                    tbody.children[i].cells[2].innerHTML = '0x' + ('0000' + value.toString(16)).slice(-4);
+                    let td = tbody.children[i].cells[6];
+                    set_value(value, td, Reg_RDA5807[i][1], Reg_RDA5807[i][2], Reg_RDA5807[i][3], Reg_RDA5807[i][4]);
+                    for (let j = i + 1; j < Reg_RDA5807.length; j++) {
+                        if (Reg_RDA5807[j][0] === reg) {
+                            let td = tbody.children[j].cells[3];
+                            set_value(value, td, Reg_RDA5807[j][1], Reg_RDA5807[j][2], Reg_RDA5807[j][3], Reg_RDA5807[j][4]);
+                        }
+                    }
+                    break;
+                }
+            }
+
+        }
+
+        function set_value(value, td, mask, shift, type, digits) {
+            let val = (value & mask) >> shift;
+            if (type === 'd') {
+                td.innerHTML = val;
+            } else if (type === 'x') {
+                td.innerHTML = ('0000' + val.toString(16)).slice(0 - digits);
+            } else if (type === 'b') {
+                td.innerHTML = ('0000000000000000' + val.toString(2)).slice(0 - digits);
+            }
+        }
+
+        function check_rx_data(str) {
+            console.log(str);
+            args = str.split(' ');
+            if (args.length == 3) {
+                if (args[0] === 'reg') {
+                    reg = parseInt(args[1]);
+                    value = parseInt(args[2], 16);
+                    set_table_reg(reg, value);
+                }
+            } else if (args.length == 2) {
+                if (args[0] === 'volume') {
+                    let value = parseInt(args[1]);
+                    document.getElementById('volume2').value = value;
+                } else if (args[0] === 'frequency') {
+                    let frequency = parseFloat(args[1]);
+                    document.getElementById('tbl_station').innerHTML = '---------';
+                    for (let i = 0; i < stations.length; i++) {
+                        if (stations[i][0] === frequency) {
+                            document.getElementById('tbl_station').innerHTML = stations[i][1];
+                            break;
+                        }
+                    }
+                }
+            } else if (args.length == 8) {
+                if (args[0] === 'status') {
+                    let value = parseInt(args[4]);
+                    document.getElementById('volume2').value = value;
+                    let frequency = parseFloat(args[1]);
+                    let rssi = parseInt(args[3]);
+                    document.getElementById('tbl_frequency').innerHTML = frequency.toFixed(1);
+                    document.getElementById('tbl_mode').innerHTML = args[2];
+                    document.getElementById('tbl_rssi').innerHTML = rssi;
+                    for (let i = 0; i < stations.length; i++) {
+                        if (stations[i][0] === frequency) {
+                            document.getElementById('tbl_station').innerHTML = stations[i][1];
+                            break;
+                        }
+                    }
+                    flg_mute = args[5] === 'mute' ? true : false;
+                    flg_bass = args[6] === 'bass' ? true : false;
+                    flg_mono = args[7] === 'out_mono' ? true : false;
+                    let str = flg_mute ? 'unmute' : 'mute';
+                    document.getElementById('mutebutton').innerHTML = str;
+                    str = flg_bass ? 'no boost' : 'Bass boost';
+                    document.getElementById('bassbutton').innerHTML = str;
+                    str = flg_mono ? 'stereo' : 'mono';
+                    document.getElementById('monobutton').innerHTML = str;
+                }
+            }
+        }
+
+        function onclick_mute() {
+            let message = flg_mute ? 'mute off' : 'mute on';
+            let ht = flg_mute ? 'mute' : 'unmute';
+            document.getElementById('mutebutton').innerHTML = ht;
+            flg_mute = !flg_mute;
+            send_message(message)
+        }
+
+        function onclick_bass() {
+            let message = flg_bass ? 'bass off' : 'bass on';
+            let ht = flg_bass ? 'Bass boost' : 'no boost';
+            document.getElementById('bassbutton').innerHTML = ht;
+            flg_bass = !flg_bass;
+            send_message(message)
+        }
+
+        function onclick_mono() {
+            let message = flg_mono ? 'mono off' : 'mono on';
+            let ht = flg_mono ? 'mono' : 'stereo';
+            document.getElementById('monobutton').innerHTML = ht;
+            flg_mono = !flg_mono;
+            send_message(message)
+        }
+
+        function onclick_reg() {
+            let ht = flg_reg ? 'view-reg' : 'hide-reg';
+            let display = flg_reg ? 'none' : '';
+            document.getElementById('regbutton').innerHTML = ht;
+            document.getElementById('register_table').style.display = display;
+            flg_reg = !flg_reg;
+        }
+
+        function onclick_station(f) {
+            send_message("frequency " + f)
+        }
+
+        function onclick_volume(mode) {
+            send_message('volume ' + mode)
+        }
+
+        function onchange_volume(obj) {
+            send_message('volume ' + obj.value);
+        }
+
+        function onclick_seek(mode) {
+            document.getElementById('tbl_station').innerHTML = 'seek ' + mode;
+            document.getElementById('tbl_frequency').innerHTML = '-----';
+            document.getElementById('tbl_mode').innerHTML = '-----';
+            document.getElementById('tbl_rssi').innerHTML = '-----';
+            send_message('seek ' + mode)
+        }
+
+        function onclick_td(obj) {
+            let td = obj;
+            let address = parseInt(obj.parentNode.children[1].innerHTML);
+            send_message("read reg " + address);
+        }
+
+    </script>
+</body>
+
+</html>
